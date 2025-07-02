@@ -14,6 +14,82 @@ const __dirname = path.dirname(__filename);
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const basePlugins = {
+  html: new HtmlWebpackPlugin({
+    template: "./public/index.html",
+  }),
+  webpackBar: new WebpackBar(),
+  friendlyErrors: new FriendlyErrorsWebpackPlugin(),
+};
+
+const developmentPlugins = {
+  reactRefresh: new ReactRefreshWebpackPlugin({ overlay: true }),
+};
+
+const productionPlugins = {
+  miniCssExtract: new MiniCssExtractPlugin({
+    filename: "static/css/[name].[contenthash:8].css",
+    chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
+  }),
+};
+
+const moduleRules = [
+  {
+    test: /\.(ts|tsx)$/,
+    exclude: /node_modules/,
+    use: {
+      loader: "babel-loader",
+      options: {
+        plugins: [!isProduction && "react-refresh/babel"].filter(Boolean),
+      },
+    },
+  },
+  {
+    test: /\.css$/,
+    use: [
+      isProduction ? MiniCssExtractPlugin.loader : "style-loader",
+      "css-loader",
+      "postcss-loader",
+    ],
+  },
+  {
+    test: /\.(png|jpe?g|gif|svg|ico|webp)$/i,
+    type: "asset/resource",
+  },
+  {
+    test: /\.(woff|woff2|eot|ttf|otf)$/i,
+    type: "asset/resource",
+  },
+  {
+    test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)$/i,
+    type: "asset/resource",
+  },
+];
+
+const devServerConfig = {
+  static: {
+    directory: path.join(__dirname, "public"),
+  },
+  client: {
+    overlay: {
+      errors: true,
+      warnings: false,
+    },
+  },
+  compress: true,
+  port: 3000,
+  hot: true,
+  open: true,
+};
+
+const optimizationConfig = {
+  minimize: isProduction,
+  minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+  splitChunks: {
+    chunks: "all",
+  },
+};
+
 const webpackConfig = {
   mode: isProduction ? "production" : "development",
   entry: "./src/index.tsx",
@@ -31,74 +107,16 @@ const webpackConfig = {
     },
   },
   module: {
-    rules: [
-      {
-        test: /\.(ts|tsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            plugins: [!isProduction && "react-refresh/babel"].filter(Boolean),
-          },
-        },
-      },
-      {
-        test: /\.css$/,
-        use: [
-          isProduction ? MiniCssExtractPlugin.loader : "style-loader",
-          "css-loader",
-          "postcss-loader",
-        ],
-      },
-      {
-        test: /\.(png|jpe?g|gif|svg|ico|webp)$/i,
-        type: "asset/resource",
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: "asset/resource",
-      },
-      {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)$/i,
-        type: "asset/resource",
-      },
-    ],
+    rules: moduleRules,
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: "./public/index.html",
-    }),
-    !isProduction && new ReactRefreshWebpackPlugin({ overlay: true }),
-    isProduction &&
-      new MiniCssExtractPlugin({
-        filename: "static/css/[name].[contenthash:8].css",
-        chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
-      }),
-    new WebpackBar(),
-    new FriendlyErrorsWebpackPlugin(),
-  ].filter(Boolean),
-  optimization: {
-    minimize: isProduction,
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
-    splitChunks: {
-      chunks: "all",
-    },
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, "public"),
-    },
-    client: {
-      overlay: {
-        errors: true,
-        warnings: false,
-      },
-    },
-    compress: true,
-    port: 3000,
-    hot: true,
-    open: true,
-  },
+    ...Object.values(basePlugins),
+    ...(isProduction
+      ? Object.values(productionPlugins)
+      : Object.values(developmentPlugins)),
+  ],
+  optimization: optimizationConfig,
+  devServer: devServerConfig,
   devtool: isProduction ? false : "eval-source-map",
 };
 
