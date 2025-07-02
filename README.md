@@ -55,7 +55,7 @@ This template comes with a set of pre-configured scripts to help you with develo
 ## Folder Structure
 
 ```
-/roobet
+/simple-react-spa-starter-template
 ├── build/              # Production build output
 ├── public/             # Static assets and the main index.html template
 │   └── index.html
