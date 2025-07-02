@@ -35,6 +35,20 @@ const DEV_SERVER = {
   host: "localhost",
 };
 
+const BUILD_CONFIG = {
+  isProduction,
+  mode: isProduction ? "production" : "development",
+  devtool: isProduction ? false : "eval-source-map",
+};
+
+const RESOLVE_CONFIG = {
+  extensions: [".tsx", ".ts", ".js", ".json"],
+  alias: {
+    "@": PATHS.src,
+  },
+};
+
+// Plugin configurations
 const basePlugins = {
   html: new HtmlWebpackPlugin({
     template: PATHS.template,
@@ -113,7 +127,7 @@ const optimizationConfig = {
 };
 
 const webpackConfig = {
-  mode: isProduction ? "production" : "development",
+  mode: BUILD_CONFIG.mode,
   entry: PATHS.entry,
   output: {
     path: PATHS.build,
@@ -122,24 +136,19 @@ const webpackConfig = {
     assetModuleFilename: ASSET_PATHS.assets,
     clean: true,
   },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js", ".json"],
-    alias: {
-      "@": PATHS.src,
-    },
-  },
+  resolve: RESOLVE_CONFIG,
   module: {
     rules: moduleRules,
   },
   plugins: [
     ...Object.values(basePlugins),
-    ...(isProduction
+    ...(BUILD_CONFIG.isProduction
       ? Object.values(productionPlugins)
       : Object.values(developmentPlugins)),
   ],
   optimization: optimizationConfig,
   devServer: devServerConfig,
-  devtool: isProduction ? false : "eval-source-map",
+  devtool: BUILD_CONFIG.devtool,
 };
 
 export default webpackConfig;
