@@ -48,7 +48,6 @@ const RESOLVE_CONFIG = {
   },
 };
 
-// Plugin configurations
 const basePlugins = {
   html: new HtmlWebpackPlugin({
     template: PATHS.template,
