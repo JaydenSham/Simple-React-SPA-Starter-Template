@@ -14,9 +14,30 @@ const __dirname = path.dirname(__filename);
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const PATHS = {
+  src: path.resolve(__dirname, "src"),
+  build: path.resolve(__dirname, "build"),
+  public: path.resolve(__dirname, "public"),
+  template: "./public/index.html",
+  entry: "./src/index.tsx",
+};
+
+const ASSET_PATHS = {
+  js: "static/js/[name].[contenthash:8].js",
+  jsChunk: "static/js/[name].[contenthash:8].chunk.js",
+  css: "static/css/[name].[contenthash:8].css",
+  cssChunk: "static/css/[name].[contenthash:8].chunk.css",
+  assets: "static/assets/[name].[hash][ext]",
+};
+
+const DEV_SERVER = {
+  port: 3000,
+  host: "localhost",
+};
+
 const basePlugins = {
   html: new HtmlWebpackPlugin({
-    template: "./public/index.html",
+    template: PATHS.template,
   }),
   webpackBar: new WebpackBar(),
   friendlyErrors: new FriendlyErrorsWebpackPlugin(),
@@ -28,8 +49,8 @@ const developmentPlugins = {
 
 const productionPlugins = {
   miniCssExtract: new MiniCssExtractPlugin({
-    filename: "static/css/[name].[contenthash:8].css",
-    chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
+    filename: ASSET_PATHS.css,
+    chunkFilename: ASSET_PATHS.cssChunk,
   }),
 };
 
@@ -68,7 +89,7 @@ const moduleRules = [
 
 const devServerConfig = {
   static: {
-    directory: path.join(__dirname, "public"),
+    directory: PATHS.public,
   },
   client: {
     overlay: {
@@ -77,7 +98,8 @@ const devServerConfig = {
     },
   },
   compress: true,
-  port: 3000,
+  port: DEV_SERVER.port,
+  host: DEV_SERVER.host,
   hot: true,
   open: true,
 };
@@ -92,18 +114,18 @@ const optimizationConfig = {
 
 const webpackConfig = {
   mode: isProduction ? "production" : "development",
-  entry: "./src/index.tsx",
+  entry: PATHS.entry,
   output: {
-    path: path.resolve(__dirname, "build"),
-    filename: "static/js/[name].[contenthash:8].js",
-    chunkFilename: "static/js/[name].[contenthash:8].chunk.js",
-    assetModuleFilename: "static/assets/[name].[hash][ext]",
+    path: PATHS.build,
+    filename: ASSET_PATHS.js,
+    chunkFilename: ASSET_PATHS.jsChunk,
+    assetModuleFilename: ASSET_PATHS.assets,
     clean: true,
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js", ".json"],
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      "@": PATHS.src,
     },
   },
   module: {
