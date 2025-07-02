@@ -1,5 +1,5 @@
 {
-  "name": "react-spa-starter-template",
+  "name": "simple-react-spa-starter-template",
   "scripts": {
     "dev": "webpack-dev-server --mode development",
     "build": "NODE_ENV=production webpack --mode production",

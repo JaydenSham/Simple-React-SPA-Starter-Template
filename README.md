@@ -1,4 +1,4 @@
-# React SPA Starter Template
+# Simple React SPA Starter Template
 
 This is a minimalistic, production-ready starter template for building Single Page Applications (SPAs) with React. It comes pre-configured with a modern toolchain designed for a great developer experience and an optimized final build.
 
